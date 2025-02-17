@@ -38,7 +38,8 @@ static ssize_t pyjama_write(struct file* file_pointer,
     kernel_buffer[count] = '\0'; // Null-terminate the string
     buffer_length = count;
 
-    printk("pyjama_write: Stored \"%s\"\n", kernel_buffer);
+    printk("pyjama_write: Stored %s\n", kernel_buffer);
+    // printk("pyjama_write: Stored \"%s\"\n", kernel_buffer);
     return count;
 }
 
@@ -47,19 +48,34 @@ static ssize_t pyjama_read(struct file* file_pointer,
                     char *user_space_buffer,
                     size_t count,
                     loff_t* offset) {
-    char msg[] = "Ack!\n";
-    size_t len = strlen(msg);
-    int result;
+    size_t len = strlen(kernel_buffer);
+    // printk(KERN_INFO "pyjama_read. strlen kernel_buffer: %zu\n", len);
     printk("pyjama_read\n");
+    ssize_t ret;
+
+    // printk("pyjama_read: outside count: %zu\n", count);
+    // printk("pyjama_read: outside *offset: %llu\n", *offset);
     
     if (*offset >= len){
-        return 0;
+        return 0; // EOF
     }
-
-    result = copy_to_user(user_space_buffer, msg, len);
-    *offset += len;
     
-    return len;
+    if (count > len - *offset){
+        // printk("pyjama_read: len: %zu\n", len);
+        // printk("pyjama_read: before count: %zu\n", count);
+        // printk("pyjama_read: *offset: %llu\n", *offset);
+        count = len - *offset;
+        // printk("pyjama_read: after count: %zu\n", count);
+    };
+
+    ret = copy_to_user(user_space_buffer, kernel_buffer + *offset, count);
+    
+    if (ret)
+        return -EFAULT;
+
+    *offset += count;
+    
+    return count;
 }
 
 struct proc_ops driver_proc_ops = {
