@@ -7,7 +7,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR( "Sriram Suresh <srisuresh@tamu.edu>");
-MODULE_DESCRIPTION( "Basic read loadable kernel module");
+MODULE_DESCRIPTION( "Basic read and write loadable kernel module");
 
 #define BUFFER_SIZE 256  // Define buffer size
 
