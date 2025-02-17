@@ -25,6 +25,8 @@ static ssize_t pyjama_write(struct file* file_pointer,
         return -EFAULT;
     }
 
+    // printk("pyjama_write: outside count: %zu\n", count);
+
     if (count > BUFFER_SIZE - 1) // Limit input size
         count = BUFFER_SIZE - 1;
 
@@ -37,6 +39,7 @@ static ssize_t pyjama_write(struct file* file_pointer,
 
     kernel_buffer[count] = '\0'; // Null-terminate the string
     buffer_length = count;
+    // printk("pyjama_write: outside count near end: %zu\n", count);
 
     printk("pyjama_write: Stored %s\n", kernel_buffer);
     // printk("pyjama_write: Stored \"%s\"\n", kernel_buffer);
